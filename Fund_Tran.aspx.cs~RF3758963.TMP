@@ -1,0 +1,74 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using System.Data;
+using System.Data.SqlClient;
+using System.Configuration;
+namespace HCL_EXCERCISE_CHALAPATHI
+{
+    public partial class Fund_Tran : System.Web.UI.Page
+    {
+        SqlConnection cn = null;
+        SqlCommand cmd = null;
+        SqlDataReader dr = null;
+        string strSqlCommand = String.Empty;
+
+        protected void Page_Load(object sender, EventArgs e)
+        {
+            cn = new SqlConnection(); cn.ConnectionString = ConfigurationManager.ConnectionStrings["conStr"].ConnectionString;
+            if (!IsPostBack)
+            {
+
+            }
+        }
+
+        protected void btnSave_Click(object sender, EventArgs e)
+        {
+            if (btnSave.Text == "Save")
+            {
+                strSqlCommand = "Insert Into Bank_App_Trans_tab (Account_Number, Beneficiary, Withdrawal, Message) Values(" + txtaccfrom.Text.Trim() + ", " + txtba.Text.Trim() + "," + txtamount.Text.Trim() + ", '" + txtmess.Text.Trim() + "')";
+
+                if (cn.State != ConnectionState.Open)
+                    cn.Open();
+                cmd = new SqlCommand();
+                cmd.CommandText = strSqlCommand;
+                cmd.Connection = cn;
+                int rowAffected = cmd.ExecuteNonQuery();
+                if (rowAffected > 0)
+                {
+
+                    lblStatus.Text = "<b style='color:green'>Fund Transaction successfull!!!</b>";
+                    txtaccfrom.Text = string.Empty;
+                    txtba.Text = string.Empty;
+                    txtamount.Text = string.Empty;
+                    txtmess.Text = string.Empty;
+                }
+
+                else
+                {
+                    lblStatus.Text = "<b style='color:red>Transaction failed!!!</b>";
+                }
+                cn.Close();
+            }
+            else if(btnSave.Text == "Update")
+            {
+                strSqlCommand = "update Bank_App_Bal_tab set Account_Bal=Account_Bal-1000 where Tran_Num=(Select Max(Tran_Num) from Bank_App_Bal_tab)";
+                if (cn.State != ConnectionState.Open)
+                    cn.Open();
+                cmd = new SqlCommand();
+                cmd.CommandText = strSqlCommand;
+                cmd.Connection = cn;
+                int rowAffected = cmd.ExecuteNonQuery();
+                if(rowAffected>0)
+                {
+                    lblStatus.Text = "<b style='color:green'>Fund Transaction successfull!!!</b>";
+                }
+                cn.Close();
+            }
+        }
+       
+    }
+    }
